@@ -71,14 +71,19 @@ int main(){
         scanf("%d",&o);
         if(o==0)
             break;
-        else if(o==1)
-            push();
-        else if(o==2)
-            pop();
-        else if(o==3)
-            show();
-        else
-            printf("Wrong choice...\n");
+        switch(o){
+            case 1:
+                push();
+                break;
+            case 2:
+                pop();
+                break;
+            case 3:
+                show();
+                break;
+            default:
+                printf("Wrong choice...\n");
+        }
     }
     printf("Exiting program...\n\n");
     return 0;
