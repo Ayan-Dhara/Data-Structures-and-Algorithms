@@ -1,5 +1,5 @@
 /*
- * Implementing list using Linked-list
+ * Implementing list using circular Linked-list
  */
 
 #include<stdio.h>
@@ -18,7 +18,7 @@ void push(){
         headNode = newNode = (struct node*)malloc(sizeof(struct node));
     else{
         newNode = headNode;
-        while(newNode->next)
+        while(newNode->next != headNode)
             newNode = newNode->next;
         newNode->next = (struct node*)malloc(sizeof(struct node));
         newNode = newNode->next;
@@ -27,7 +27,7 @@ void push(){
         printf("\nCannot allocate memory block...");
         return;
     }
-    newNode->next = NULL;
+    newNode->next = headNode;
     printf("\nEnter the element:");
     scanf("%d", &newNode->value);
     count++;
@@ -37,37 +37,45 @@ void push(){
 void pushAt(){
     int i = 0;
     int position;
-    struct node *newNode, *tempNode = NULL;
+    struct node *newNode, *tempNode;
 
     printf("\nEnter the position to push:");
     scanf("%d", &position);
 
     if(headNode == NULL){
         if(position == 0)
-            headNode = newNode = (struct node*)malloc(sizeof(struct node));
+            tempNode = headNode = newNode = (struct node*)malloc(sizeof(struct node));
         else{
             printf("Cannot push at %d. List is empty.", position);
             return;
         }
     }
     else if(position == 0){
-        newNode = (struct node*)malloc(sizeof(struct node));
+        tempNode = headNode;
+        while(tempNode->next != headNode)
+            tempNode = tempNode->next;
+        tempNode->next = newNode = (struct node*)malloc(sizeof(struct node));
         tempNode = headNode;
         headNode = newNode;
     }
     else{
-        newNode = headNode;
+        tempNode = headNode;
         for(i = 0; i < position-1; i++){
-            if(newNode->next)
-                newNode = newNode->next;
+            if(tempNode->next != headNode)
+                tempNode = tempNode->next;
             else{
                 printf("Cannot push at %d. Length of list is %d.", position, i+1);
                 return;
             }
         }
+        newNode = (struct node*)malloc(sizeof(struct node));
+        if(newNode == NULL){
+            printf("Cannot allocate memory block...");
+            return;
+        }
+        newNode->next = tempNode->next;
+        tempNode->next = newNode;
         tempNode = newNode->next;
-        newNode->next = (struct node*)malloc(sizeof(struct node));
-        newNode = newNode->next;
     }
     if(newNode == NULL){
         printf("Cannot allocate memory block...");
@@ -92,7 +100,7 @@ void getAt(){
         scanf("%d", &position);
         currentNode = headNode;
         for(i = 0; i < position; i++){
-            if(currentNode->next)
+            if(currentNode->next != headNode)
                 currentNode = currentNode->next;
             else{
                 printf("Nothing at %d. Length of list is %d.", position, i+1);
@@ -123,6 +131,8 @@ void search(){
                     printf(" %d is found at %d", element, i);
             }
             currentNode = currentNode->next;
+            if(currentNode == headNode)
+                break;
             i++;
         }
         if(!found)
@@ -133,7 +143,7 @@ void search(){
 void deleteValue(){
     int i = 0, found = 0;
     int element;
-    struct node *currentNode, *prevNode = NULL;
+    struct node *currentNode, *prevNode = NULL, *lastNode;
 
     if(headNode == NULL)
         printf("\nList is empty.");
@@ -144,7 +154,10 @@ void deleteValue(){
         while(currentNode){
             if(currentNode->value == element){
                 if(prevNode == NULL){
-                    headNode = currentNode->next;
+                    lastNode = headNode;
+                    while(lastNode->next != headNode)
+                        lastNode = lastNode->next;
+                    lastNode->next = headNode = currentNode->next;
                     free(currentNode);
                     currentNode = headNode;
                 }
@@ -162,6 +175,8 @@ void deleteValue(){
                 prevNode = currentNode;
                 currentNode = currentNode->next;
             }
+            if(currentNode == headNode)
+                break;
             i++;
         }
         if(!found)
@@ -172,7 +187,7 @@ void deleteValue(){
 void deleteAt(){
     int i = 0;
     int position,value;
-    struct node *currentNode, *prevNode=NULL;
+    struct node *currentNode, *prevNode=NULL, *lastNode;
 
     if(headNode == NULL)
         printf("\nList is empty.");
@@ -181,7 +196,7 @@ void deleteAt(){
         scanf("%d", &position);
         currentNode = headNode;
         for(i = 0; i < position; i++){
-            if(currentNode->next){
+            if(currentNode->next != headNode){
                 prevNode = currentNode;
                 currentNode = currentNode->next;
             }
@@ -197,7 +212,10 @@ void deleteAt(){
         }
         else{
             value = headNode->value;
-            headNode = headNode->next;
+            prevNode = headNode;
+            while(prevNode->next != headNode)
+                prevNode = prevNode->next;
+            prevNode->next = headNode = headNode->next;
             free(currentNode);
         }
         printf(" %d is deleted from position %d.", value, position);
@@ -214,8 +232,9 @@ void viewList(){
         while(currentNode){
             printf(" %d", currentNode->value);
             currentNode = currentNode->next;
-            if(currentNode)
-                printf(",");
+            if(currentNode == headNode)
+                break;
+            printf(",");
         }
     }
 }
@@ -230,6 +249,8 @@ void deleteList(){
             tempNode = currentNode;
             currentNode = currentNode->next;
             free(tempNode);
+            if(currentNode == headNode)
+                break;
         }
         printf("\nThe list is deleted.");
     }
@@ -252,9 +273,9 @@ void init(){
             }
             if(newNode == NULL){
                 printf("Cannot allocate memory block...");
-                return 1;
+                return;
             }
-            newNode->next = NULL;
+            newNode->next = headNode;
             scanf("%d", &newNode->value);
         }
     }
