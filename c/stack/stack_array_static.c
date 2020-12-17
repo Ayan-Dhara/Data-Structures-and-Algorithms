@@ -7,6 +7,7 @@
 
 #include<stdio.h>
 
+int MAX = 100;
 int stack[100];
 int count = 0; //number of elements in stack
 
@@ -18,7 +19,7 @@ void pop(){
 }
 
 void push(){
-    if(count == 100){
+    if(count == MAX){
         printf("\nMaximum number of element in the stack reached");
         return;
     }
@@ -44,11 +45,11 @@ int main(){
     int i, option;
     printf(" Stack using static memory allocation\n");
     printf(" ************************************\n\n");
-    printf("Enter the no of elements in the stack (max 100):");
+    printf("Enter the no of elements in the stack (max %d):",MAX);
     scanf("%d", &count);
-    if(count > 100){
-        printf("You can add only 100 elements\n");
-        count = 100;
+    if(count > MAX){
+        printf("You can add only %d elements\n",MAX);
+        count = MAX;
     }
     if(count > 0)
         printf("Enter the elements:");

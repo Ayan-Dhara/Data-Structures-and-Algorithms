@@ -10,9 +10,7 @@ int count = 0;
 struct node{
     int value;
     struct node *next;
-};
-
-struct node *headNode = NULL;
+}*headNode = NULL;
 
 void push(){
     struct node *newNode;
@@ -26,13 +24,14 @@ void push(){
         newNode = newNode->next;
     }
     if(newNode == NULL){
-        printf("Cannot allocate memory block...");
+        printf("\nCannot allocate memory block...");
         return;
     }
     newNode->next = NULL;
-    printf("Enter the element:");
+    printf("\nEnter the element:");
     scanf("%d", &newNode->value);
     count++;
+    printf(" %d is pushed to the list.",newNode->value);
 }
 
 void pushAt(){
@@ -40,14 +39,21 @@ void pushAt(){
     int position;
     struct node *newNode, *temp = NULL;
 
-    printf("Enter the position to push:");
+    printf("\nEnter the position to push:");
     scanf("%d", &position);
 
     if(headNode == NULL){
         if(position == 0)
             headNode = newNode = (struct node*)malloc(sizeof(struct node));
-        else
+        else{
             printf("Cannot push at %d. List is empty.", position);
+            return;
+        }
+    }
+    else if(position == 0){
+        newNode = (struct node*)malloc(sizeof(struct node));
+        temp = headNode;
+        headNode = newNode;
     }
     else{
         newNode = headNode;
@@ -63,10 +69,15 @@ void pushAt(){
         newNode->next = (struct node*)malloc(sizeof(struct node));
         newNode = newNode->next;
     }
+    if(newNode == NULL){
+        printf("Cannot allocate memory block...");
+        return;
+    }
     newNode->next = temp;
     printf("Enter the element:");
     scanf("%d", &newNode->value);
     count++;
+    printf(" %d is pushed at %d.", newNode->value, position);
 }
 
 void getAt(){
@@ -75,16 +86,16 @@ void getAt(){
     struct node *currentNode;
 
     if(headNode == NULL)
-        printf("List is empty.");
+        printf("\nList is empty.");
     else{
-        printf("Enter the position:");
+        printf("\nEnter the position:");
         scanf("%d", &position);
         currentNode = headNode;
         for(i = 0; i < position; i++){
             if(currentNode->next)
                 currentNode = currentNode->next;
             else{
-                printf("Nothing at %d. Length of list is %d.", position, i+2);
+                printf("Nothing at %d. Length of list is %d.", position, i+1);
                 return;
             }
         }
@@ -98,18 +109,18 @@ void search(){
     struct node *currentNode;
 
     if(headNode == NULL)
-        printf("List is empty.");
+        printf("\nList is empty.");
     else{
-        printf("Enter the element:");
+        printf("\nEnter the element:");
         scanf("%d", &element);
 
         currentNode = headNode;
         while(currentNode){
             if(currentNode->value == element){
-                if(found++ == 0)
-                    printf("%d is found at %d", element, i);
-                else
+                if(found++)
                     printf(", %d", i);
+                else
+                    printf(" %d is found at %d", element, i);
             }
             currentNode = currentNode->next;
             i++;
@@ -125,28 +136,25 @@ void deleteValue(){
     struct node *currentNode, *tempNode = NULL, *prevNode = NULL;
 
     if(headNode == NULL)
-        printf("List is empty.");
+        printf("\nList is empty.");
     else{
-        printf("Enter the element:");
+        printf("\nEnter the element:");
         scanf("%d", &element);
         currentNode = headNode;
         while(currentNode){
             if(currentNode->value == element){
-                printf("Deleting: ");
                 if(prevNode == NULL){
-                    printf("prevNode is NULL\n");
                     headNode = currentNode->next;
                     free(currentNode);
                     currentNode = headNode;
                 }
                 else{
-                    printf("prevValue is %d. headValue is %d\n", prevNode->value, headNode->value);
                     prevNode->next = currentNode->next;
                     free(currentNode);
                     currentNode = prevNode->next;
                 }
                 if(found++ == 0)
-                    printf("%d is deleted from position %d", element, i);
+                    printf(" %d is deleted from position %d", element, i);
                 else
                     printf(", %d", i);
             }
@@ -163,13 +171,13 @@ void deleteValue(){
 
 void deleteAt(){
     int i = 0;
-    int position;
+    int position,value;
     struct node *currentNode, *prevNode=NULL;
 
     if(headNode == NULL)
-        printf("List is empty.");
+        printf("\nList is empty.");
     else{
-        printf("Enter the position:");
+        printf("\nEnter the position:");
         scanf("%d", &position);
         currentNode = headNode;
         for(i = 0; i < position; i++){
@@ -178,27 +186,30 @@ void deleteAt(){
                 currentNode = currentNode->next;
             }
             else{
-                printf("Nothing at %d. Length of list is %d.", position, i+2);
+                printf("Nothing at %d. Length of list is %d.", position, i+1);
                 return;
             }
         }
         if(prevNode){
             prevNode->next = currentNode->next;
+            value = currentNode->value;
             free(currentNode);
         }
         else{
+            value = headNode->value;
             headNode = headNode->next;
             free(currentNode);
         }
+        printf(" %d is deleted from position %d.", value, position);
     }
 }
 
 void viewList(){
     struct node *currentNode;
     if(headNode == NULL)
-        printf("The list is empty.");
+        printf("\nThe list is empty.");
     else{
-        printf("The elements in the list:");
+        printf("\nThe elements in the list:");
         currentNode = headNode;
         while(currentNode){
             printf(" %d", currentNode->value);
@@ -212,26 +223,22 @@ void viewList(){
 void deleteList(){
     struct node *currentNode, *tempNode;
     if(headNode == NULL)
-        printf("The list is already empty.");
+        printf("\nThe list is already empty.");
     else{
         currentNode = headNode;
         while(currentNode){
             tempNode = currentNode;
             currentNode = currentNode->next;
-            if(currentNode)
-                printf(",");
             free(tempNode);
         }
+        printf("\nThe list is deleted.");
     }
     headNode = NULL;
-    printf("The list is deleted.");
 }
 
-int main(){
-    int i, option;
+void init(){
+    int i;
     struct node* newNode;
-    printf(" Implementation of list using Linked-list\n");
-    printf(" ****************************************\n\n");
     printf("Enter the no of elements in the list:");
     scanf("%d", &count);
     if(count > 0){
@@ -251,13 +258,20 @@ int main(){
             scanf("%d", &newNode->value);
         }
     }
+}
 
+int main(){
+    int option;
+    printf(" Implementation of list using Linked-list\n");
+    printf(" ****************************************\n\n");
+
+    init();
     viewList();
 
     while(1){
         printf("\n\nChoose an option:\n");
         printf("  1. Push element                2. Push element at position\n");
-        printf("  3. Get element from position   4. Search element from list\n");
+        printf("  3. Search element from list    4. Get element from position\n");
         printf("  5. Delete element              6. Delete element from position\n");
         printf("  7. Show all elements in list   8. Delete all elements in list\n");
         printf("  0. Exit");
@@ -273,10 +287,10 @@ int main(){
                 pushAt();
                 break;
             case 3:
-                getAt();
+                search();
                 break;
             case 4:
-                search();
+                getAt();
                 break;
             case 5:
                 deleteValue();
@@ -294,6 +308,7 @@ int main(){
                 printf("Wrong choice...\n");
         }
     }
-    printf("Exiting program...\n\n");
+    deleteList();
+    printf("\nExiting program...\n\n");
     return 0;
 }

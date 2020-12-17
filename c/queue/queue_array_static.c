@@ -7,6 +7,7 @@
 
 #include<stdio.h>
 
+int MAX = 100;
 int queue[100];
 int front = 0; //where to push the element
 int back = 0; //from where to pop the element
@@ -22,7 +23,7 @@ void pop(){
 }
 
 void push(){
-    if(front == 99){
+    if(front == MAX-1){
         printf("\nUpper limit of the queue reached.\nPop all elements to insert again");
         return;
     }
@@ -50,11 +51,11 @@ int main(){
     int i, option;
     printf(" Queue using static memory allocation\n");
     printf(" ************************************\n\n");
-    printf("Enter the no of elements in the queue (max 100):");
+    printf("Enter the no of elements in the queue (max %d):",MAX);
     scanf("%d",&front);
-    if(front > 100){
-        printf("You can add only 100 elements.\n");
-        front = 100;
+    if(front > MAX){
+        printf("You can add only %d elements.\n",MAX);
+        front = MAX;
     }
     if(front > 0)
         printf("Enter the elements:");
