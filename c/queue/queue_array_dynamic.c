@@ -10,19 +10,19 @@
 
 int *queue;
 int front = 0; //where to push the element
-int back = 0; //from where to pop the element
+int rear = 0; //from where to pop the element
 
-void pop(){
+void dequeue(){
     if(front == 0)
         printf("\nThe queue is empty!");
     else{
-        printf("\n %d popped from the queue.", queue[back++]);
-        if(front == back)
-            front = back = 0;
+        printf("\n %d popped from the queue.", queue[rear++]);
+        if(front == rear)
+            front = rear = 0;
     }
 }
 
-void push(){
+void enqueue(){
     queue = realloc(queue, sizeof(int)*(front+1));
     printf("\nEnter the element:");
     scanf("%d", &queue[front]);
@@ -36,8 +36,8 @@ void show(){
         printf("\nThere are no element in the queue.");
     else{
         printf("\nThe elements are:");
-        for(i = back; i < front; i++){
-            if(i > back)
+        for(i = rear; i < front; i++){
+            if(i > rear)
                 printf(",");
             printf(" %d", queue[i]);
         }
@@ -72,10 +72,10 @@ int main(){
             break;
         switch(option){
             case 1:
-                push();
+                enqueue();
                 break;
             case 2:
-                pop();
+                dequeue();
                 break;
             case 3:
                 show();
@@ -84,6 +84,7 @@ int main(){
                 printf("Wrong choice...\n");
         }
     }
+    free(queue);
     printf("Exiting program...\n\n");
     return 0;
 }

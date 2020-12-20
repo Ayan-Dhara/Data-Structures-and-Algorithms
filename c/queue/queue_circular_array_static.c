@@ -1,48 +1,56 @@
 /*
  * Program for implementing
- * queue operations
+ * circular queue operations
  * using array with
  * static memory allocation
  */
 
 #include<stdio.h>
 
-int MAX = 5;
-int queue[5];
-int front = 0; //where to push the element
-int rear = 0; //from where to pop the element
+int MAX = 100;
+int queue[100];
+int rear = 0; //from where to get the element
+int count = 0; //number of elements in the queue
+
+_Bool isEmpty(){
+    return count == 0;
+}
+
+_Bool isFull(){
+    return count == MAX;
+}
 
 void dequeue(){
-    if(front == 0)
+    if(count == 0)
         printf("\nThe queue is empty!");
     else{
         printf("\n %d popped from the queue.", queue[rear++]);
-        if(front == rear)
-            front = rear = 0;
+        rear = rear % MAX;
+        count--;
     }
 }
 
 void enqueue(){
-    if(front == MAX){
-        printf("\nUpper limit of the queue reached.\nPop all elements to insert again");
+    if(count == MAX){
+        printf("\nMaximum number of element in the queue reached.");
         return;
     }
     printf("\nEnter the element:");
-    scanf("%d", &queue[front]);
-    printf(" %d pushed to the queue.", queue[front]);
-    front++;
+    scanf("%d", &queue[rear + count]);
+    printf(" %d pushed to the queue.", queue[rear + count]);
+    count++;
 }
 
 void show(){
     int i;
-    if(front == 0)
+    if(count == 0)
         printf("\nThere are no element in the queue.");
     else{
         printf("\nThe elements are:");
-        for(i = rear; i < front; i++){
-            if(i > rear)
+        for(i = 0; i < count; i++){
+            if(i > 0)
                 printf(",");
-            printf(" %d", queue[i]);
+            printf(" %d", queue[i + rear]);
         }
     }
 }
@@ -52,14 +60,14 @@ int main(){
     printf(" Queue using static memory allocation\n");
     printf(" ************************************\n\n");
     printf("Enter the no of elements in the queue (max %d):",MAX);
-    scanf("%d",&front);
-    if(front > MAX){
+    scanf("%d",&count);
+    if(count > MAX){
         printf("You can add only %d elements.\n",MAX);
-        front = MAX;
+        count = MAX;
     }
-    if(front > 0)
+    if(count > 0)
         printf("Enter the elements:");
-    for(i = 0; i < front; i++)
+    for(i = 0; i < count; i++)
         scanf("%d", &queue[i]);
     show();
     while(1){
