@@ -5,8 +5,6 @@
 #include<stdio.h>
 #include<malloc.h>
 
-int count = 0;
-
 struct node{
     int value;
     struct node *next;
@@ -30,7 +28,6 @@ void push(){
     newNode->next = NULL;
     printf("\nEnter the element:");
     scanf("%d", &newNode->value);
-    count++;
     printf(" %d is pushed to the list.",newNode->value);
 }
 
@@ -76,7 +73,6 @@ void pushAt(){
     newNode->next = tempNode;
     printf("Enter the element:");
     scanf("%d", &newNode->value);
-    count++;
     printf(" %d is pushed at %d.", newNode->value, position);
 }
 
@@ -237,7 +233,7 @@ void deleteList(){
 }
 
 void init(){
-    int i;
+    int count,i;
     struct node* newNode;
     printf("Enter the no of elements in the list:");
     scanf("%d", &count);
@@ -252,7 +248,7 @@ void init(){
             }
             if(newNode == NULL){
                 printf("Cannot allocate memory block...");
-                return 1;
+                return;
             }
             newNode->next = NULL;
             scanf("%d", &newNode->value);

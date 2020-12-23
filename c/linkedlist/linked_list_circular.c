@@ -5,8 +5,6 @@
 #include<stdio.h>
 #include<malloc.h>
 
-int count = 0;
-
 struct node{
     int value;
     struct node *next;
@@ -30,7 +28,6 @@ void push(){
     newNode->next = headNode;
     printf("\nEnter the element:");
     scanf("%d", &newNode->value);
-    count++;
     printf(" %d is pushed to the list.",newNode->value);
 }
 
@@ -84,7 +81,6 @@ void pushAt(){
     newNode->next = tempNode;
     printf("Enter the element:");
     scanf("%d", &newNode->value);
-    count++;
     printf(" %d is pushed at %d.", newNode->value, position);
 }
 
@@ -142,8 +138,8 @@ void search(){
 
 void deleteValue(){
     int i = 0, found = 0;
-    int element;
-    struct node *currentNode, *prevNode = NULL, *lastNode;
+    int element, deletedFromFirst=0;;
+    struct node *currentNode, *prevNode = NULL, *lastNode = NULL;
 
     if(headNode == NULL)
         printf("\nList is empty.");
@@ -154,12 +150,21 @@ void deleteValue(){
         while(currentNode){
             if(currentNode->value == element){
                 if(prevNode == NULL){
-                    lastNode = headNode;
-                    while(lastNode->next != headNode)
-                        lastNode = lastNode->next;
-                    lastNode->next = headNode = currentNode->next;
-                    free(currentNode);
-                    currentNode = headNode;
+                    if(headNode->next == headNode){
+                        free(headNode);
+                        currentNode = headNode = NULL;
+                    }
+                    else{
+                        if(!lastNode){
+                            lastNode = headNode;
+                            while(lastNode->next != headNode)
+                                lastNode = lastNode->next;
+                        }
+                        lastNode->next = headNode = currentNode->next;
+                        free(currentNode);
+                        currentNode = headNode;
+                    }
+                    deletedFromFirst=1;
                 }
                 else{
                     prevNode->next = currentNode->next;
@@ -175,8 +180,9 @@ void deleteValue(){
                 prevNode = currentNode;
                 currentNode = currentNode->next;
             }
-            if(currentNode == headNode)
+            if(currentNode == headNode && deletedFromFirst == 0)
                 break;
+            else deletedFromFirst=0;
             i++;
         }
         if(!found)
@@ -187,7 +193,7 @@ void deleteValue(){
 void deleteAt(){
     int i = 0;
     int position,value;
-    struct node *currentNode, *prevNode=NULL, *lastNode;
+    struct node *currentNode, *prevNode=NULL;
 
     if(headNode == NULL)
         printf("\nList is empty.");
@@ -212,11 +218,18 @@ void deleteAt(){
         }
         else{
             value = headNode->value;
-            prevNode = headNode;
-            while(prevNode->next != headNode)
-                prevNode = prevNode->next;
-            prevNode->next = headNode = headNode->next;
-            free(currentNode);
+            if(headNode->next == headNode){
+                free(headNode);
+                currentNode = headNode = NULL;
+            }
+            else{
+                prevNode = headNode;
+                while(prevNode->next != headNode)
+                    prevNode = prevNode->next;
+                prevNode->next = headNode = currentNode->next;
+                free(currentNode);
+                currentNode = headNode;
+            }
         }
         printf(" %d is deleted from position %d.", value, position);
     }
@@ -258,7 +271,7 @@ void deleteList(){
 }
 
 void init(){
-    int i;
+    int count,i;
     struct node* newNode;
     printf("Enter the no of elements in the list:");
     scanf("%d", &count);
@@ -283,8 +296,8 @@ void init(){
 
 int main(){
     int option;
-    printf(" Implementation of list using Linked-list\n");
-    printf(" ****************************************\n\n");
+    printf(" Implementation of list using Circular Linked-list\n");
+    printf(" *************************************************\n\n");
 
     init();
     viewList();

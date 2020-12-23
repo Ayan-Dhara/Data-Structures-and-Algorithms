@@ -7,16 +7,16 @@
 
 #include<stdio.h>
 
-int MAX = 5;
-int queue[5];
-int front = 0; //where to push the element
-int rear = 0; //from where to pop the element
+int MAX = 100;
+int queue[100];
+int front = 0; //where to insert the element
+int rear = 0; //from where to remove the element
 
 void dequeue(){
     if(front == 0)
         printf("\nThe queue is empty!");
     else{
-        printf("\n %d popped from the queue.", queue[rear++]);
+        printf("\n %d dequeued from the queue.", queue[rear++]);
         if(front == rear)
             front = rear = 0;
     }
@@ -29,7 +29,7 @@ void enqueue(){
     }
     printf("\nEnter the element:");
     scanf("%d", &queue[front]);
-    printf(" %d pushed to the queue.", queue[front]);
+    printf(" %d enqueued to the queue.", queue[front]);
     front++;
 }
 
@@ -64,8 +64,8 @@ int main(){
     show();
     while(1){
         printf("\n\nChoose an option:\n");
-        printf("  1. Push element\n");
-        printf("  2. Pop element\n");
+        printf("  1. Enqueue element\n");
+        printf("  2. Dequeue element\n");
         printf("  3. Show elements\n");
         printf("  0. Exit");
         printf("\n\nEnter choice:");

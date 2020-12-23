@@ -9,7 +9,7 @@
 
 int MAX = 100;
 int queue[100];
-int rear = 0; //from where to get the element
+int rear = 0; //from where to remove the element
 int count = 0; //number of elements in the queue
 
 _Bool isEmpty(){
@@ -24,7 +24,7 @@ void dequeue(){
     if(count == 0)
         printf("\nThe queue is empty!");
     else{
-        printf("\n %d popped from the queue.", queue[rear++]);
+        printf("\n %d dequeue from the queue.", queue[rear++]);
         rear = rear % MAX;
         count--;
     }
@@ -37,7 +37,7 @@ void enqueue(){
     }
     printf("\nEnter the element:");
     scanf("%d", &queue[rear + count]);
-    printf(" %d pushed to the queue.", queue[rear + count]);
+    printf(" %d enqueue to the queue.", queue[rear + count]);
     count++;
 }
 
@@ -57,8 +57,8 @@ void show(){
 
 int main(){
     int i, option;
-    printf(" Queue using static memory allocation\n");
-    printf(" ************************************\n\n");
+    printf(" Circular Queue using static memory allocation\n");
+    printf(" *********************************************\n\n");
     printf("Enter the no of elements in the queue (max %d):",MAX);
     scanf("%d",&count);
     if(count > MAX){
@@ -72,8 +72,8 @@ int main(){
     show();
     while(1){
         printf("\n\nChoose an option:\n");
-        printf("  1. Push element\n");
-        printf("  2. Pop element\n");
+        printf("  1. Enqueue element\n");
+        printf("  2. Dequeue element\n");
         printf("  3. Show elements\n");
         printf("  0. Exit");
         printf("\n\nEnter choice:");
