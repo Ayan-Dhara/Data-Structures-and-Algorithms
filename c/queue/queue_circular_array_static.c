@@ -12,14 +12,6 @@ int queue[100];
 int rear = 0; //from where to remove the element
 int count = 0; //number of elements in the queue
 
-_Bool isEmpty(){
-    return count == 0;
-}
-
-_Bool isFull(){
-    return count == MAX;
-}
-
 void dequeue(){
     if(count == 0)
         printf("\nThe queue is empty!");
