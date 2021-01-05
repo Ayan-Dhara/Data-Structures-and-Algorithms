@@ -1,5 +1,5 @@
 /*
- * Implementing list using Linked-list
+ * Implementing list using doubly Linked-list
  */
 
 #include<stdio.h>
@@ -8,27 +8,31 @@
 struct node{
     int value;
     struct node *next;
-}*headNode = NULL;
+    struct node *prev;
+}*firstNode = NULL, *lastNode = NULL;
 
 void push(){
     struct node *newNode;
-    if(headNode == NULL)
-        headNode = newNode = (struct node*)malloc(sizeof(struct node));
-    else{
-        newNode = headNode;
-        while(newNode->next)
-            newNode = newNode->next;
-        newNode->next = (struct node*)malloc(sizeof(struct node));
-        newNode = newNode->next;
-    }
+
+    newNode = (struct node*)malloc(sizeof(struct node));
     if(newNode == NULL){
         printf("\nCannot allocate memory block...");
         return;
     }
+
+    if(firstNode == NULL){
+        firstNode = lastNode = newNode;
+        newNode->prev = NULL;
+    }
+    else{
+        lastNode->next = newNode;
+        newNode->prev = lastNode;
+        lastNode = newNode;
+    }
     newNode->next = NULL;
     printf("\nEnter the element:");
     scanf("%d", &newNode->value);
-    printf(" %d is pushed to the list.",  newNode->value);
+    printf(" %d is pushed to the list.", newNode->value);
 }
 
 void pushAt(){
@@ -39,38 +43,43 @@ void pushAt(){
     printf("\nEnter the position to push:");
     scanf("%d", &position);
 
-    if(headNode == NULL){
-        if(position == 0)
-            headNode = newNode = (struct node*)malloc(sizeof(struct node));
-        else{
-            printf("Cannot push at %d. List is empty.", position);
-            return;
-        }
+    newNode = (struct node*)malloc(sizeof(struct node));
+    if(newNode == NULL){
+        printf("\nCannot allocate memory block...");
+        return;
     }
-    else if(position == 0){
-        newNode = (struct node*)malloc(sizeof(struct node));
-        tempNode = headNode;
-        headNode = newNode;
+
+    if(position == 0){
+        newNode->next = firstNode;
+        newNode->prev = NULL;
+        if(firstNode)
+            firstNode->prev = newNode;
+        firstNode = newNode;
+        if(!lastNode)
+            lastNode = newNode;
+    }
+    else if(firstNode == NULL){
+        printf("Cannot push at %d. List is empty.", position);
+        return;
     }
     else{
-        newNode = headNode;
-        for(i = 0; i < position-1; i++){
-            if(newNode->next)
-                newNode = newNode->next;
+        tempNode = firstNode;
+        for(i = 0; i < position - 1; i++){
+            if(tempNode->next)
+                tempNode = tempNode->next;
             else{
                 printf("Cannot push at %d. Length of list is %d.", position, i+1);
                 return;
             }
         }
-        tempNode = newNode->next;
-        newNode->next = (struct node*)malloc(sizeof(struct node));
-        newNode = newNode->next;
+        newNode->next = tempNode->next;
+        newNode->prev = tempNode;
+        tempNode->next = newNode;
+        if(newNode->next)
+            newNode->next->prev = newNode;
+        else
+            lastNode = newNode;
     }
-    if(newNode == NULL){
-        printf("Cannot allocate memory block...");
-        return;
-    }
-    newNode->next = tempNode;
     printf("Enter the element:");
     scanf("%d", &newNode->value);
     printf(" %d is pushed at %d.", newNode->value, position);
@@ -81,12 +90,12 @@ void getAt(){
     int position;
     struct node *currentNode;
 
-    if(headNode == NULL)
+    if(firstNode == NULL)
         printf("\nList is empty.");
     else{
         printf("\nEnter the position:");
         scanf("%d", &position);
-        currentNode = headNode;
+        currentNode = firstNode;
         for(i = 0; i < position; i++){
             if(currentNode->next)
                 currentNode = currentNode->next;
@@ -104,13 +113,13 @@ void search(){
     int element;
     struct node *currentNode;
 
-    if(headNode == NULL)
+    if(firstNode == NULL)
         printf("\nList is empty.");
     else{
         printf("\nEnter the element:");
         scanf("%d", &element);
 
-        currentNode = headNode;
+        currentNode = firstNode;
         while(currentNode){
             if(currentNode->value == element){
                 if(found++)
@@ -129,35 +138,47 @@ void search(){
 void deleteValue(){
     int i = 0, found = 0;
     int element;
-    struct node *currentNode, *prevNode = NULL;
+    struct node *currentNode, *tempNode;
 
-    if(headNode == NULL)
+    if(firstNode == NULL)
         printf("\nList is empty.");
     else{
         printf("\nEnter the element:");
         scanf("%d", &element);
-        currentNode = headNode;
+        currentNode = firstNode;
         while(currentNode){
             if(currentNode->value == element){
-                if(prevNode == NULL){
-                    headNode = currentNode->next;
+                if(currentNode->next && currentNode->prev){
+                    currentNode->next->prev = currentNode->prev;
+                    currentNode->prev->next = currentNode->next;
+                    tempNode = currentNode;
+                    currentNode = currentNode->next;
+                    free(tempNode);
+                }
+                else if(currentNode->next){
+                    firstNode = currentNode->next;
+                    firstNode->prev = NULL;
                     free(currentNode);
-                    currentNode = headNode;
+                    currentNode = firstNode;
+                }
+                else if(currentNode->prev){
+                    lastNode = currentNode->prev;
+                    lastNode->next = NULL;
+                    free(currentNode);
+                    currentNode = NULL;
                 }
                 else{
-                    prevNode->next = currentNode->next;
+                    lastNode = firstNode = NULL;
                     free(currentNode);
-                    currentNode = prevNode->next;
+                    currentNode = NULL;
                 }
                 if(found++)
                     printf(", %d", i);
                 else
                     printf(" %d is deleted from position %d", element, i);
             }
-            else{
-                prevNode = currentNode;
+            else
                 currentNode = currentNode->next;
-            }
             i++;
         }
         if(!found)
@@ -168,33 +189,49 @@ void deleteValue(){
 void deleteAt(){
     int i = 0;
     int position,value;
-    struct node *currentNode, *prevNode=NULL;
+    struct node *currentNode, *tempNode;
 
-    if(headNode == NULL)
+    if(firstNode == NULL)
         printf("\nList is empty.");
     else{
         printf("\nEnter the position:");
         scanf("%d", &position);
-        currentNode = headNode;
+        currentNode = firstNode;
         for(i = 0; i < position; i++){
-            if(currentNode->next){
-                prevNode = currentNode;
+            if(currentNode->next)
                 currentNode = currentNode->next;
-            }
             else{
                 printf("Nothing at %d. Length of list is %d.", position, i+1);
                 return;
             }
         }
-        if(prevNode){
-            prevNode->next = currentNode->next;
+        if(currentNode->next && currentNode->prev){
+            currentNode->next->prev = currentNode->prev;
+            currentNode->prev->next = currentNode->next;
+            tempNode = currentNode;
+            currentNode = currentNode->next;
+            value = tempNode->value;
+            free(tempNode);
+        }
+        else if(currentNode->next){
+            firstNode = currentNode->next;
+            firstNode->prev = NULL;
             value = currentNode->value;
             free(currentNode);
+            currentNode = firstNode;
+        }
+        else if(currentNode->prev){
+            lastNode = currentNode->prev;
+            lastNode->next = NULL;
+            value = currentNode->value;
+            free(currentNode);
+            currentNode = NULL;
         }
         else{
-            value = headNode->value;
-            headNode = headNode->next;
+            lastNode = firstNode = NULL;
+            value = currentNode->value;
             free(currentNode);
+            currentNode = NULL;
         }
         printf(" %d is deleted from position %d.", value, position);
     }
@@ -202,11 +239,11 @@ void deleteAt(){
 
 void viewList(){
     struct node *currentNode;
-    if(headNode == NULL)
+    if(firstNode == NULL)
         printf("\nThe list is empty.");
     else{
         printf("\nThe elements in the list:");
-        currentNode = headNode;
+        currentNode = firstNode;
         while(currentNode){
             printf(" %d", currentNode->value);
             currentNode = currentNode->next;
@@ -216,12 +253,28 @@ void viewList(){
     }
 }
 
+void viewReverse(){
+    struct node *currentNode;
+    if(lastNode == NULL)
+        printf("\nThe list is empty.");
+    else{
+        printf("\nThe elements in the list:");
+        currentNode = lastNode;
+        while(currentNode){
+            printf(" %d", currentNode->value);
+            currentNode = currentNode->prev;
+            if(currentNode)
+                printf(",");
+        }
+    }
+}
+
 void deleteList(){
     struct node *currentNode, *tempNode;
-    if(headNode == NULL)
+    if(firstNode == NULL)
         printf("\nThe list is already empty.");
     else{
-        currentNode = headNode;
+        currentNode = firstNode;
         while(currentNode){
             tempNode = currentNode;
             currentNode = currentNode->next;
@@ -229,28 +282,33 @@ void deleteList(){
         }
         printf("\nThe list is deleted.");
     }
-    headNode = NULL;
+    firstNode = lastNode = NULL;
 }
 
 void init(){
     int count,i;
-    struct node* newNode;
+    struct node* newNode, *prevNode = NULL;
     printf("Enter the no of elements in the list:");
     scanf("%d", &count);
     if(count > 0){
         printf("Enter the values in the list:");
         for(i=0; i < count; i++){
-            if(headNode == NULL)
-                headNode = newNode = (struct node*)malloc(sizeof(struct node));
-            else{
-                newNode->next = (struct node*)malloc(sizeof(struct node));
-                newNode = newNode->next;
-            }
+            newNode = (struct node*)malloc(sizeof(struct node));
             if(newNode == NULL){
-                printf("Cannot allocate memory block...");
+                printf("\nCannot allocate memory block...");
                 return;
             }
-            newNode->next = NULL;
+            if(firstNode == NULL){
+                firstNode = lastNode = newNode;
+                newNode->next = newNode->prev = NULL;
+            }
+            else{
+                prevNode->next = newNode;
+                newNode->prev = prevNode;
+                newNode->next = NULL;
+            }
+            prevNode = newNode;
+            lastNode = newNode;
             scanf("%d", &newNode->value);
         }
     }
@@ -269,7 +327,8 @@ int main(){
         printf("  1. Push element                2. Push element at position\n");
         printf("  3. Search element from list    4. Get element from position\n");
         printf("  5. Delete element              6. Delete element from position\n");
-        printf("  7. Show all elements in list   8. Delete all elements in list\n");
+        printf("  7. Show all elements in list   8. Show all elements in reverse\n");
+        printf("  9. Delete all elements in list\n");
         printf("  0. Exit");
         printf("\n\nEnter choice:");
         scanf("%d", &option);
@@ -298,6 +357,9 @@ int main(){
                 viewList();
                 break;
             case 8:
+                viewReverse();
+                break;
+            case 9:
                 deleteList();
                 break;
             default:

@@ -143,6 +143,6 @@ int main(){
         }
     }
     deleteList();
-    printf("Exiting program...\n\n");
+    printf("\n\nExiting program...\n\n");
     return 0;
 }
